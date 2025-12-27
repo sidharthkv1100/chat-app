@@ -1,19 +1,17 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { collection, addDoc, onSnapshot, query, where, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase";
-import {
-  collection,
-  addDoc,
-  query,
-  where,
-  onSnapshot,
-  serverTimestamp
-} from "firebase/firestore";
 import RoomSelector from "./RoomSelector";
 
-const Chat = ({ user }) => {
-  const [room, setRoom] = useState(null);
+function Chat({ user }) {
+  const [room, setRoom] = useState("");
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
+
+  // SAFETY CHECK (prevents crash)
+  if (!user) {
+    return <p>Loading user...</p>;
+  }
 
   useEffect(() => {
     if (!room) return;
@@ -23,44 +21,49 @@ const Chat = ({ user }) => {
       where("room", "==", room)
     );
 
-    const unsub = onSnapshot(q, (snap) => {
-      setMessages(snap.docs.map((d) => d.data()));
+    const unsub = onSnapshot(q, (snapshot) => {
+      setMessages(snapshot.docs.map(doc => doc.data()));
     });
 
     return () => unsub();
   }, [room]);
 
   const sendMessage = async () => {
-    if (!text) return;
+    if (!text.trim()) return;
 
     await addDoc(collection(db, "messages"), {
       text,
       room,
-      user: user.displayName,
+      user: user.displayName || "Anonymous",
       createdAt: serverTimestamp()
     });
 
     setText("");
   };
 
-  if (!room) return <RoomSelector setRoom={setRoom} />;
+  // ✅ MUST RETURN JSX
+  if (!room) {
+    return <RoomSelector setRoom={setRoom} />;
+  }
 
   return (
     <div>
       <h2>Room: {room}</h2>
 
-      {messages.map((m, i) => (
-        <p key={i}><b>{m.user}:</b> {m.text}</p>
+      {messages.map((msg, i) => (
+        <p key={i}>
+          <strong>{msg.user}:</strong> {msg.text}
+        </p>
       ))}
 
       <input
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder="Type message"
+        placeholder="Type a message"
       />
       <button onClick={sendMessage}>Send</button>
     </div>
   );
-};
+}
 
 export default Chat;
