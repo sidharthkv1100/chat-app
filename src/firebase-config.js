@@ -1,21 +1,22 @@
-// Import the functions you need from the SDKs you need
+// src/firebase.js
+
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { getFirestore } from "@firebase/firestore";
-
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBw8kPQkxNvVY2cB6ghVc20FlxhP4e_Xs4",
-  authDomain: "testproj-531d7.firebaseapp.com",
-  projectId: "testproj-531d7",
-  storageBucket: "testproj-531d7.appspot.com",
-  messagingSenderId: "705585244276",
-  appId: "1:705585244276:web:6905459d1c0800f7ba0921",
-  measurementId: "G-KWJSWQRNV0"
+  apiKey: "AIzaSyDdbWQ0mA7vVDjHiJ_jEBXhic6JoALjVbQ",
+  authDomain: "chat-app-b479e.firebaseapp.com",
+  projectId: "chat-app-b479e",
+  storageBucket: "chat-app-b479e.appspot.com",
+  messagingSenderId: "542528158640",
+  appId: "1:542528158640:web:e8bac7a9a76b3b59acf475"
 };
 
-// Initialize Firebase
+// Initialize Firebase ONCE
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+
+// Exports used by your app
 export const auth = getAuth(app);
 export const provider = new GoogleAuthProvider();
+export const db = getFirestore(app);
